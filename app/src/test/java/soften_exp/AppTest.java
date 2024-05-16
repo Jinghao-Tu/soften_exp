@@ -4,11 +4,50 @@
 package soften_exp;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class AppTest {
     // @Test void appHasAGreeting() {
     //     App classUnderTest = new App();
     //     assertNotNull(classUnderTest.getGreeting(), "app should have a greeting");
     // }
+    private App app = new App();
+
+    @Test
+    public void loadFileTest() {
+        app.loadFile();
+    }
+
+    @ParameterizedTest
+    @CsvFileSource(resources = "/task3.csv", numLinesToSkip = 0)
+    public void searchBrigeWordTest(String word1, String word2) throws Exception {
+        loadFileTest();
+        assertDoesNotThrow(() -> {
+            String output = app.queryBridgeWords(word1, word2);
+            System.out.println(output);
+        });
+    }
+
+    @ParameterizedTest
+    @CsvFileSource(resources = "/task4.csv", numLinesToSkip = 0)
+    public void generateNewTextTest(String inputtext) throws Exception {
+        loadFileTest();
+        assertDoesNotThrow(() -> {
+            String output = app.generateNewText(inputtext);
+            System.out.println(output);
+        });
+    }
+
+    @ParameterizedTest
+    @CsvFileSource(resources = "/task5.csv", numLinesToSkip = 0)
+    public void calMinTraceTest(String word1, String word2) throws Exception {
+        loadFileTest();
+        assertDoesNotThrow(() -> {
+            String output = app.calcShortestPath(word1,word2 != null ? word2 : "");
+            System.out.println(output);
+        });
+    }
 }
