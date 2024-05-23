@@ -1,40 +1,17 @@
 package soften_exp;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.geom.Line2D;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.PriorityQueue;
-import java.util.Set;
+import sun.nio.cs.ext.MacHebrew;
 
 import javax.imageio.ImageIO;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.util.List;
+import java.util.*;
 
 /**
  * @author tjh && hyb
@@ -62,13 +39,13 @@ public class App {
 
     /**
      * 创建初始 GUI
-     * 
+     *
      * @param frame
      */
     private void createInitialGUI(JFrame frame) {
         // create the welcome screen
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 400);
+        frame.setSize(500, 450);
         JPanel panel = new JPanel();
 
         // set the layout of the panel
@@ -136,7 +113,7 @@ public class App {
         });
         constraints.gridy = i++;
         panel.add(paint_graph_button, constraints);
-        
+
         // add blank space
         constraints.gridy = i++;
         panel.add(Box.createVerticalStrut(10), constraints);
@@ -164,7 +141,7 @@ public class App {
         });
         constraints.gridy = i++;
         panel.add(search_bridge_words_button, constraints);
-        
+
         // add blank space
         constraints.gridy = i++;
         panel.add(Box.createVerticalStrut(10), constraints);
@@ -330,7 +307,7 @@ public class App {
         });
         constraints.gridy = i++;
         panel.add(random_walk_button, constraints);
-        
+
         // add blank space
         constraints.gridy = i++;
         panel.add(Box.createVerticalStrut(10), constraints);
@@ -349,7 +326,7 @@ public class App {
 
     /**
      * 创建获取文件 GUI
-     * 
+     *
      * @param frame
      */
     private void createGetFileGUI(JFrame frame) {
@@ -424,11 +401,10 @@ public class App {
 
     /**
      * 查询桥接词
-     * 
+     *
      * @param word1
      * @param word2
      * @return 桥接词
-     * 
      */
     public String queryBridgeWords(String word1, String word2) {
         String output = null;
@@ -462,7 +438,7 @@ public class App {
 
     /**
      * 生成新文本, 插入随机桥接词
-     * 
+     *
      * @param inputText
      * @return 新文本
      */
@@ -489,7 +465,7 @@ public class App {
 
     /**
      * 获取第一个单词
-     * 
+     *
      * @param str
      * @return 第一个单词
      */
@@ -504,7 +480,7 @@ public class App {
 
     /**
      * 获取最后一个单词
-     * 
+     *
      * @param str
      * @return 最后一个单词
      */
@@ -519,7 +495,7 @@ public class App {
 
     /**
      * 计算最短路径
-     * 
+     *
      * @param word1
      * @param word2
      * @return 最短路径
@@ -585,7 +561,7 @@ public class App {
 
     /**
      * 计算输入单词到其他所有词的最短路径
-     * 
+     *
      * @param startIndex
      * @param distance
      * @return 最短路径
@@ -648,7 +624,7 @@ public class App {
 
     /**
      * 递归查找路径
-     * 
+     *
      * @param start
      * @param end
      * @param predecessors
@@ -657,7 +633,7 @@ public class App {
      * @param resultPaths
      */
     public void findPaths(int start, int end, List<List<Integer>> predecessors, List<String> wordList,
-            List<String> currentPath, List<List<String>> resultPaths) {
+                          List<String> currentPath, List<List<String>> resultPaths) {
         if (end == start) {
             currentPath.add(wordList.get(end));
             Collections.reverse(currentPath);
@@ -728,7 +704,6 @@ public class App {
 
     /**
      * 打印图
-     *
      */
     public void printGraph() {
         // /* test the visited edges and visited words */
@@ -761,7 +736,7 @@ public class App {
             frame.dispose();
         });
         panel.add(quit_button);
-        
+
         // add a save button
         JButton save_button = new JButton("Save");
         save_button.addActionListener(e -> {
@@ -835,7 +810,7 @@ class DirectedGraphSwing extends JPanel {
     // frame.setVisible(true)
 
     public DirectedGraphSwing(Set<String> words, Map<String, Map<String, Integer>> connections,
-            Set<String> visitedEdges, Set<String> visitedWords) {
+                              Set<String> visitedEdges, Set<String> visitedWords) {
         this.words = words;
         this.connections = connections;
         this.visitedEdges = visitedEdges;
@@ -858,7 +833,7 @@ class DirectedGraphSwing extends JPanel {
             int row = index / gridSize;
             int col = index % gridSize;
             positions.put(word, new Point(cellSize * col + cellSize / 2, cellSize * row + cellSize / 2));
-            velocities.put(word, new double[] { 0, 0 });
+            velocities.put(word, new double[]{0, 0});
             index++;
         }
 
@@ -867,7 +842,7 @@ class DirectedGraphSwing extends JPanel {
             // Calculate repulsion forces
             for (String word1 : words) {
                 Point pos1 = positions.get(word1);
-                double[] force = new double[] { 0, 0 };
+                double[] force = new double[]{0, 0};
 
                 for (String word2 : words) {
                     if (!word1.equals(word2)) {
@@ -974,6 +949,27 @@ class DirectedGraphSwing extends JPanel {
                     g2d.setColor(Color.BLACK);
                 }
                 g2d.draw(new Line2D.Double(fromPos.x, fromPos.y, toPos.x, toPos.y));
+
+                double arrowWidth = 10;
+                double arrowHeight = 10;
+                // 计算箭头的角度
+                double angle = Math.atan2(toPos.y - fromPos.y, toPos.x - fromPos.x);
+
+                // 创建箭头形状
+                Path2D.Double arrowHead = new Path2D.Double();
+                arrowHead.moveTo(0, 0);
+                arrowHead.lineTo(-arrowWidth, -arrowHeight);
+                arrowHead.lineTo(arrowWidth, -arrowHeight);
+                arrowHead.closePath();
+
+                // 变换箭头的位置和方向
+                AffineTransform transform = new AffineTransform();
+                transform.translate(toPos.x - RADIUS / 2 * Math.cos(angle), toPos.y - RADIUS / 2 * Math.sin(angle));
+                transform.rotate(angle - Math.PI / 2);
+
+                // 绘制箭头
+                g2d.fill(transform.createTransformedShape(arrowHead));
+
                 // Draw weight
                 float rate = 0.2f;
                 int midX = fromPos.x + (int) ((toPos.x - fromPos.x) * rate);
@@ -996,7 +992,7 @@ class DirectedGraphSwing extends JPanel {
             g2d.drawString(word, pos.x - RADIUS / 2, pos.y - RADIUS / 2);
         }
     }
-    
+
     public void saveImage(File file) {
         try {
             BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
