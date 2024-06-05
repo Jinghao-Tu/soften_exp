@@ -87,6 +87,7 @@ class AppTest {
         app.loadFile(true);
 
         Set<String> possiblePaths = new HashSet<>();
+        // 所有可能的路径:
         // 1 2 1
         // 1 3 2 1
         // 2 1 2
