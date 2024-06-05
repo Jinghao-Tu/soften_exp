@@ -15,6 +15,7 @@ class AppTest {
 
     @Test
     public void queryBridgeWordsTest() {
+        // 这是一个黑盒测试
         // 等价类划分：
         //word1 和 word2 都在图中存在。
         //word1 在图中存在，word2 在图中不存在。
@@ -25,7 +26,6 @@ class AppTest {
         //word1 和 word2 是不同的词，但它们没有直接的连接。
         //word1 和 word2 是不同的词，它们有直接的连接
 
-        // print current path
         System.out.println(System.getProperty("user.dir"));
         app.filePath = System.getProperty("user.dir") + "/src/test/resources/in.txt";
         app.loadFile(true);
