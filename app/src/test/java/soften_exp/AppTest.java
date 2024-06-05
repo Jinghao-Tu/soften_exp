@@ -7,8 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class AppTest {
     private App app = new App();
@@ -26,7 +28,6 @@ class AppTest {
         //word1 和 word2 是不同的词，但它们没有直接的连接。
         //word1 和 word2 是不同的词，它们有直接的连接
 
-        System.out.println(System.getProperty("user.dir"));
         app.filePath = System.getProperty("user.dir") + "/src/test/resources/in.txt";
         app.loadFile(true);
 
@@ -77,5 +78,31 @@ class AppTest {
         word2 = "new";
         result = "and ";
         assertEquals("The bridge words from \"" + word1 + "\" to \"" + word2 + "\" are: " + result, app.queryBridgeWords("life", "new"));
+    }
+
+    @Test
+    public void randomWalkTest() {
+        // 这是一个白盒测试
+        app.filePath = System.getProperty("user.dir") + "/src/test/resources/in2.txt";
+        app.loadFile(true);
+
+        Set<String> possiblePaths = new HashSet<>();
+        // 1 2 1
+        // 1 3 2 1
+        // 2 1 2
+        // 2 1 3 2
+        // 3 2 1 2
+        // 3 2 1 3
+        possiblePaths.add("one two one");
+        possiblePaths.add("one three two one");
+        possiblePaths.add("two one two");
+        possiblePaths.add("two one three two");
+        possiblePaths.add("three two one two");
+        possiblePaths.add("three two one three");
+
+        for (int i = 0; i < 100; i++) {
+            String result = app.randomWalk();
+            assertTrue(possiblePaths.contains(result));
+        }
     }
 }
