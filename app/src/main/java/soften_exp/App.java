@@ -1,20 +1,52 @@
 package soften_exp;
 
-import sun.nio.cs.ext.MacHebrew;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.PriorityQueue;
+import java.util.Set;
+
+import javax.imageio.ImageIO;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
 
 /**
+ * 软件工程实验 App.
+
  * @author tjh && hyb
+ * @version 0.1
  */
 public class App {
 
@@ -177,7 +209,8 @@ public class App {
         JButton calc_shortest_path_button = new JButton("Calculate Shortest Path");
         calc_shortest_path_button.addActionListener(e -> {
             String word1 = JOptionPane.showInputDialog(frame, "Enter the first word:");
-            String word2 = JOptionPane.showInputDialog(frame, "Enter the second word: (can be empty to calculate all paths from the first word)");
+            String word2 = JOptionPane.showInputDialog(frame,
+                    "Enter the second word: (can be empty to calculate all paths from the first word)");
             String output = calcShortestPath(word1, word2);
             System.out.println(output);
             // create a new frame to display the output
@@ -293,11 +326,11 @@ public class App {
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     File file = fileChooser.getSelectedFile();
                     try {
-                        file.createNewFile();
+                        // file.createNewFile();
                         // write the output to the file
-                        FileWriter fileWriter = new FileWriter(file);
-                        fileWriter.write(output);
-                        fileWriter.close();
+                        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
+                            writer.write(output);
+                        }
                     } catch (IOException e2) {
                         e2.printStackTrace();
                     }
@@ -354,7 +387,7 @@ public class App {
         // read the file line by line
         List<String> temp_words = new ArrayList<String>();
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(this.filePath));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(this.filePath), StandardCharsets.UTF_8));
 
             String line = reader.readLine();
             while (line != null) {
@@ -397,6 +430,18 @@ public class App {
                 this.graph.put(word1, temp);
             }
         }
+
+        // print the graph in the terminal
+        System.out.println("Graph:");
+        for (Map.Entry<String, Map<String, Integer>> entry1 : this.graph.entrySet()) {
+            String word1 = entry1.getKey();
+            Map<String, Integer> innerMap = entry1.getValue();
+            for (Map.Entry<String, Integer> entry2 : innerMap.entrySet()) {
+                String word2 = entry2.getKey();
+                Integer count = entry2.getValue();
+                System.out.println(word1 + " -> " + word2 + ": " + count);
+            }
+        }
     }
 
     /**
@@ -410,7 +455,8 @@ public class App {
         String output = null;
         /* 查找输入词汇是否在图中出现 */
         if (!this.words.contains(word1) || !this.words.contains(word2)) {
-            output = "No " + (!this.words.contains(word1) ? "\"" + word1 + "\"" : "") + (!this.words.contains(word1) && !this.words.contains(word2) ? " and " : "")
+            output = "No " + (!this.words.contains(word1) ? "\"" + word1 + "\"" : "")
+                    + (!this.words.contains(word1) && !this.words.contains(word2) ? " and " : "")
                     + (!this.words.contains(word2) ? "\"" + word2 + "\"" : "") + " in the graph!";
             return output;
         }
@@ -424,10 +470,12 @@ public class App {
             }
         }
         if (bridgeWords.size() > 0) {
-            output = "The bridge words from \"" + word1 + "\" to \"" + word2 + "\" are: ";
-            for (String word : bridgeWords) {
-                output = output + word + " ";
+            StringBuilder sb = new StringBuilder();
+            sb.append("The bridge words from \"" + word1 + "\" to \"" + word2 + "\" are: ");
+            for (String bridgeWord : bridgeWords) {
+                sb.append(bridgeWord).append(" ");
             }
+            output = sb.toString();
             return output;
         }
 
@@ -633,7 +681,7 @@ public class App {
      * @param resultPaths
      */
     public void findPaths(int start, int end, List<List<Integer>> predecessors, List<String> wordList,
-                          List<String> currentPath, List<List<String>> resultPaths) {
+            List<String> currentPath, List<List<String>> resultPaths) {
         if (end == start) {
             currentPath.add(wordList.get(end));
             Collections.reverse(currentPath);
@@ -710,16 +758,17 @@ public class App {
         // visitedEdges.clear();
         // visitedWords.clear();
         // for (String firstWord : words) {
-        //     for (String secondWord : words) {
-        //         if (graph.get(firstWord) != null && graph.get(firstWord).get(secondWord) != null) {
-        //             /* randomly set some edges to be visited, random rate is 0.1 */
-        //             if (Math.random() < 0.1) {
-        //                 visitedEdges.add(firstWord + " " + secondWord);
-        //                 visitedWords.add(firstWord);
-        //                 visitedWords.add(secondWord);
-        //             }
-        //         }
-        //     }
+        // for (String secondWord : words) {
+        // if (graph.get(firstWord) != null && graph.get(firstWord).get(secondWord) !=
+        // null) {
+        // /* randomly set some edges to be visited, random rate is 0.1 */
+        // if (Math.random() < 0.1) {
+        // visitedEdges.add(firstWord + " " + secondWord);
+        // visitedWords.add(firstWord);
+        // visitedWords.add(secondWord);
+        // }
+        // }
+        // }
         // }
 
         DirectedGraphSwing graphPanel = new DirectedGraphSwing(words, graph, visitedEdges, visitedWords);
@@ -790,7 +839,7 @@ class DirectedGraphSwing extends JPanel {
     private static final double REPULSION_CONSTANT = 4000;
     private static final double SPRING_CONSTANT = 0.32;
     private static final double DAMPING = 0.32;
-    private static final int ITERATIONS = 5000;
+    private static final int ITERATIONS = 20000;
 
     private Set<String> words;
     private Map<String, Map<String, Integer>> connections;
@@ -810,7 +859,7 @@ class DirectedGraphSwing extends JPanel {
     // frame.setVisible(true)
 
     public DirectedGraphSwing(Set<String> words, Map<String, Map<String, Integer>> connections,
-                              Set<String> visitedEdges, Set<String> visitedWords) {
+            Set<String> visitedEdges, Set<String> visitedWords) {
         this.words = words;
         this.connections = connections;
         this.visitedEdges = visitedEdges;
@@ -833,7 +882,7 @@ class DirectedGraphSwing extends JPanel {
             int row = index / gridSize;
             int col = index % gridSize;
             positions.put(word, new Point(cellSize * col + cellSize / 2, cellSize * row + cellSize / 2));
-            velocities.put(word, new double[]{0, 0});
+            velocities.put(word, new double[] { 0, 0 });
             index++;
         }
 
@@ -842,7 +891,7 @@ class DirectedGraphSwing extends JPanel {
             // Calculate repulsion forces
             for (String word1 : words) {
                 Point pos1 = positions.get(word1);
-                double[] force = new double[]{0, 0};
+                double[] force = new double[] { 0, 0 };
 
                 for (String word2 : words) {
                     if (!word1.equals(word2)) {

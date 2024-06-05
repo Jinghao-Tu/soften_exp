@@ -6,14 +6,33 @@
  * User Manual available at https://docs.gradle.org/8.0.2/userguide/building_java_projects.html
  */
 
+// spotBugs
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "com.github.spotbugs.snom:spotbugs-gradle-plugin:6.0.15"
+  }
+}
+
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
-    application
+    id 'application'
+    id "com.github.spotbugs" version "6.0.15"
 }
+
+apply plugin: "com.github.spotbugs"
 
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+    mavenLocal()
+    maven {
+        url "https://plugins.gradle.org/m2/"
+    }
 }
 
 dependencies {
@@ -22,6 +41,7 @@ dependencies {
 
     // This dependency is used by the application.
     implementation("com.google.guava:guava:31.1-jre")
+
 }
 
 application {
@@ -29,7 +49,9 @@ application {
     mainClass.set("soften_exp.App")
 }
 
-tasks.named<Test>("test") {
+tasks.named("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
 }
+
+
