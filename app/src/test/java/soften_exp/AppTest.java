@@ -8,42 +8,74 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AppTest {
-    // private App app = new App();
+    private App app = new App();
 
-    // @Test
-    // public void loadFileTest() {
-    //     app.loadFile();
-    // }
+    @Test
+    public void queryBridgeWordsTest() {
+        // 等价类划分：
+        //word1 和 word2 都在图中存在。
+        //word1 在图中存在，word2 在图中不存在。
+        //word1 在图中不存在，word2 在图中存在。
+        //word1 和 word2 都在图中不存在。
+        //边界值分析：
+        //word1 和 word2 是相同的词。
+        //word1 和 word2 是不同的词，但它们没有直接的连接。
+        //word1 和 word2 是不同的词，它们有直接的连接
 
-    // @ParameterizedTest
-    // @CsvFileSource(resources = "/task3.csv", numLinesToSkip = 0)
-    // public void searchBrigeWordTest(String word1, String word2) throws Exception {
-    //     loadFileTest();
-    //     assertDoesNotThrow(() -> {
-    //         String output = app.queryBridgeWords(word1, word2);
-    //         System.out.println(output);
-    //     });
-    // }
+        // print current path
+        System.out.println(System.getProperty("user.dir"));
+        app.filePath = System.getProperty("user.dir") + "/src/test/resources/in.txt";
+        app.loadFile(true);
 
-    // @ParameterizedTest
-    // @CsvFileSource(resources = "/task4.csv", numLinesToSkip = 0)
-    // public void generateNewTextTest(String inputtext) throws Exception {
-    //     loadFileTest();
-    //     assertDoesNotThrow(() -> {
-    //         String output = app.generateNewText(inputtext);
-    //         System.out.println(output);
-    //     });
-    // }
+        // word1 和 word2 都在图中存在，且有桥接词。例如，word1 为 "to"，word2 为 "out"。
+        // word1 和 word2 都在图中存在，但没有桥接词。例如，word1 为 "to"，word2 为 "new"。
+        // word1 在图中存在，word2 在图中不存在。例如，word1 为 "to"，word2 为 "nonexistentword"。
+        // word1 在图中不存在，word2 在图中存在。例如，word1 为 "nonexistentword"，word3 为 "and"。
+        // word1 和 word2 都在图中不存在。例如，word1 和 word2 都为 "nonexistentword"。
+        // word1 和 word2 是相同的词，且在图中存在。例如，word1 和 word2 都为 "and"。
+        // word1 和 word2 是不同的词，但它们没有直接的连接。例如，word1 为 "to"，word2 为 "and"。
+        // word1 和 word2 是不同的词，它们有直接的连接。例如，word1 为 "life"，word2 为 "new"。
+        String word1 = "to";
+        String word2 = "out";
+        String result = "seek ";
+        assertEquals("The bridge words from \"" + word1 + "\" to \"" + word2 + "\" are: " + result, app.queryBridgeWords("to", "out"));
 
-    // @ParameterizedTest
-    // @CsvFileSource(resources = "/task5.csv", numLinesToSkip = 0)
-    // public void calMinTraceTest(String word1, String word2) throws Exception {
-    //     loadFileTest();
-    //     assertDoesNotThrow(() -> {
-    //         String output = app.calcShortestPath(word1,word2 != null ? word2 : "");
-    //         System.out.println(output);
-    //     });
-    // }
+        word1 = "to";
+        word2 = "new";
+        result = "";
+        assertEquals("No bridge words from \"" + word1 + "\" to \"" + word2 + "\"!", app.queryBridgeWords("to", "new"));
+
+        word1 = "to";
+        word2 = "nonexistentword";
+        result = "";
+        assertEquals("No \"" + word2 + "\" in the graph!", app.queryBridgeWords("to", "nonexistentword"));
+
+        word1 = "nonexistentword";
+        word2 = "and";
+        result = "";
+        assertEquals("No \"" + word1 + "\" in the graph!", app.queryBridgeWords("nonexistentword", "and"));
+
+        word1 = "nonexistentword";
+        word2 = "nonexistentword";
+        result = "";
+        assertEquals("No \"" + word1 + "\" and \"" + word2 + "\" in the graph!", app.queryBridgeWords("nonexistentword", "nonexistentword"));
+
+        word1 = "and";
+        word2 = "and";
+        result = "";
+        assertEquals("No bridge words from \"" + word1 + "\" to \"" + word2 + "\"!", app.queryBridgeWords("and", "and"));
+
+        word1 = "to";
+        word2 = "and";
+        result = "";
+        assertEquals("No bridge words from \"" + word1 + "\" to \"" + word2 + "\"!", app.queryBridgeWords("to", "and"));
+
+        word1 = "life";
+        word2 = "new";
+        result = "and ";
+        assertEquals("The bridge words from \"" + word1 + "\" to \"" + word2 + "\" are: " + result, app.queryBridgeWords("life", "new"));
+    }
 }

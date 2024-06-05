@@ -469,9 +469,9 @@ public class App {
                 bridgeWords.add(word);
             }
         }
-        if (bridgeWords.size() > 0) {
+        if (!bridgeWords.isEmpty()) {
             StringBuilder sb = new StringBuilder();
-            sb.append("The bridge words from \"" + word1 + "\" to \"" + word2 + "\" are: ");
+            sb.append("The bridge words from \"").append(word1).append("\" to \"").append(word2).append("\" are: ");
             for (String bridgeWord : bridgeWords) {
                 sb.append(bridgeWord).append(" ");
             }
